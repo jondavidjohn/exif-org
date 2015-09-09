@@ -38,7 +38,7 @@ find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while 
   # Try to use modified time
   if [ ! -z "SORT_BY_MODIFIED" ]; then
     if [ ! "$year" ] || [ ! "$month" ]; then
-      date=$(stat -c %y "$image" | grep -ohE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+      date=$(stat "$image" | grep "Modify:" | cut -d' ' -f 2)
       year=$(echo $date | cut -d'-' -f 1)
       month=$(echo $date | cut -d'-' -f 2)
     fi
@@ -53,7 +53,7 @@ done
 
 # Videos
 find "$SRC" -type f -iname '*.mov' -o -iname '*.avi' -o -iname '*.mp4' | while read movie; do
-  date=$(stat -c %y "$movie" | grep -ohE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+  date=$(stat "$movie" | grep "Modify:" | cut -d' ' -f 2)
   year=$(echo $date | cut -d'-' -f 1)
   month=$(echo $date | cut -d'-' -f 2)
   mkdir -p "$DEST/Videos/$year/$month"
