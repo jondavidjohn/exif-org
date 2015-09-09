@@ -142,9 +142,8 @@ testVideoSortingByModifiedTime()
   mkdir -p /tmp/dest
 
   touch -t 201301010000 "/tmp/source/jan_1st_2013.mov"
-  touch -t 201306050000 "/tmp/source/june_5th_2013.mov"
+  touch -t 201306050000 "/tmp/source/june_5th_2013.mp4"
   touch -t 201412030000 "/tmp/source/dec_3rd_2014.avi"
-
 
   output=$(./media-org /tmp/source/ /tmp/dest/)
 
@@ -159,7 +158,7 @@ testVideoSortingByModifiedTime()
 
   # File Targets
   assertTrue "[ -f '/tmp/dest/Videos/2013/01/jan_1st_2013.mov' ]"
-  assertTrue "[ -f '/tmp/dest/Videos/2013/06/june_5th_2013.mov' ]"
+  assertTrue "[ -f '/tmp/dest/Videos/2013/06/june_5th_2013.mp4' ]"
   assertTrue "[ -f '/tmp/dest/Videos/2014/12/dec_3rd_2014.avi' ]"
 
   # Move
