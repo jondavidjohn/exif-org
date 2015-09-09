@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# Sorting of family media into date based directory structure
+#
+
+if [ -z "$1" ]; then
+  echo "usage: $0 [directory to sort from] [destination directory]"
+  exit
+fi
+
+SRC=${1%/}  # directory to sort from (force trailing slash)
+DEST=${2%/} # destination directory (force trailing slash)
+
+# Ensure we have valid directories
+if [ ! -d "$SRC" ]; then
+  echo "$SRC is not a directory"
+  exit 1
+fi
+
+if [ ! -d "$DEST" ]; then
+  echo "$DEST is not a directory"
+  exit 1
+fi
+
+# Images
+find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while read image; do
+  date=$(exif "$image" 2> /dev/null | grep "Date" | grep "(Orig" | cut -d'|' -f 2 | cut -d' ' -f 1 )
+  year=$(echo $date | cut -d':' -f 1)
+  month=$(echo $date | cut -d':' -f 2)
+
+  # Try to parse the filename
+  if [ ! "$year" ] || [ ! "$month" ]; then
+    date=$(basename "$image" | grep -ohE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+    year=$(echo $date | cut -d'-' -f 1)
+    month=$(echo $date | cut -d'-' -f 2)
+  fi
+
+  # Try to use modified time
+  if [ ! -z "SORT_BY_MODIFIED" ]; then
+    if [ ! "$year" ] || [ ! "$month" ]; then
+      date=$(stat -c %y "$image" | grep -ohE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+      year=$(echo $date | cut -d'-' -f 1)
+      month=$(echo $date | cut -d'-' -f 2)
+    fi
+  fi
+
+  if [ ! "$year" ] || [ ! "$month" ]; then continue; fi
+
+  mkdir -p "$DEST/$year/$month"
+  mv -n "$image" "$DEST/$year/$month/$(basename "$image")"
+  echo "$image => $DEST/$year/$month/$(basename "$image")"
+done
+
+# Movies
+mkdir -p "$DEST/Videos/"
+find "$SRC" -type f -iname '*.mov' -o -iname '*.avi' | while read movie; do
+  mv -n "$movie" "$DEST/Videos/"
+  echo "$movie => $DEST/Videos/$(basename "$image")"
+done
+
+# remove empty directories
+find "$SRC" -depth -type d -empty -exec rmdir {} \;
+
+# Move everything else remaining into unsortable to be manually dealt with
+mkdir -p "$DEST/Unsortable/"
+mv -n "$SRC/"* "$DEST/Unsortable/" 2>/dev/null || true
