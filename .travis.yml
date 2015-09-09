@@ -1,5 +1,4 @@
 script: make test
-addons:
-  apt:
-    packages:
-    - exif
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install exif
