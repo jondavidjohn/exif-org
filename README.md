@@ -1,6 +1,6 @@
-# exif-org
+# media-org
 
-[![Build Status](https://travis-ci.org/jondavidjohn/exif-org.svg?branch=master)](https://travis-ci.org/jondavidjohn/exif-org)
+[![Build Status](https://travis-ci.org/jondavidjohn/media-org.svg?branch=master)](https://travis-ci.org/jondavidjohn/media-org)
 
 This is a tool for a very personal use case, organizing my family media.  I tried to wrangle
 a few tools written in higher level languages, but always ran into problems trying to run them
@@ -19,34 +19,44 @@ moves files around your disk destructively.
 The goal is to take a directory full of photos and organize them based on a series of
 date based indicators.  The date of the photo is deduced in the following order...
 
-  1. Exif data id extracted and the "Date and Time (Original)" tag is used.
+  1. Exif data extracted and the "Date and Time (Original)" tag is used.
   2. A date is detected in the filename itself in the format of "YYYY-MM-DD"
   3. The file modified can also be used as a last resort with the use of a flag.
+
+Additionally Videos (.avi and .mov) are also sorted by file time.
 
 The resulting directory structure results in something like this.
 
     Destination Directory
-    ├── 2014
-    │   ├── 06
-    │   ├── 07
-    ├── 2015
-    │   ├── 06
-    │   ├── 07
-    │   └── 08
-    ├── Unsortable
-    └── Videos
+    ├── Photos
+    │   ├── 2014
+    │   │   ├── 06
+    │   │   ├── 07
+    │   └── 2015
+    │       ├── 06
+    │       ├── 07
+    │       └── 08
+    ├── Videos
+    │   ├── 2014
+    │   │   ├── 06
+    │   │   ├── 07
+    │   └── 2015
+    │       ├── 06
+    │       ├── 07
+    │       └── 08
+    └── Unsortable
 
-Videos (.avi and .mov) are moved into the `Videos` directory, and any other files in the source
-directory that cannot be sorted properly are moved into the `Unsortable` directory.
+
+Files that cannot be sorted properly are moved into the `Unsortable` directory.
 
 Basic usage is as such
 
-    usage: exif-org [directory to sort from] [destination directory]
+    usage: media-org [directory to sort from] [destination directory]
 
 ## Installation
 
-    git clone --recursive git@github.com:jondavidjohn/exif-org.git exif-org
-    cd exif-org
+    git clone --recursive https://github.com/jondavidjohn/media-org.git media-org
+    cd media-org
 
     ### make sure it works in your environment first! ###
     make test
@@ -55,7 +65,7 @@ Basic usage is as such
 
 ### Upgrade
 
-    cd exif-org
+    cd media-org
     git pull
     make test
     make uninstall

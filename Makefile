@@ -2,10 +2,10 @@ test:
 	@bash ./test/test.sh
 
 install:
-	cp ./exif-org "$${DESTDIR:-/usr/local/bin}"
-	chmod +x "$${DESTDIR:-/usr/local/bin}/exif-org"
+	cp ./media-org "$${DESTDIR:-/usr/local/bin}"
+	chmod +x "$${DESTDIR:-/usr/local/bin}/media-org"
 
 uninstall:
-	rm "$${DESTDIR:-/usr/local/bin}/exif-org"
+	rm "$${DESTDIR:-/usr/local/bin}/media-org"
 
 .PHONY: test install

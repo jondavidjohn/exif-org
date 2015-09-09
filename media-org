@@ -22,7 +22,7 @@ if [ ! -d "$DEST" ]; then
   exit 1
 fi
 
-# Images
+# Photos
 find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while read image; do
   date=$(exif "$image" 2> /dev/null | grep "Date" | grep "(Orig" | cut -d'|' -f 2 | cut -d' ' -f 1 )
   year=$(echo $date | cut -d':' -f 1)
@@ -46,16 +46,19 @@ find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while 
 
   if [ ! "$year" ] || [ ! "$month" ]; then continue; fi
 
-  mkdir -p "$DEST/$year/$month"
-  mv -n "$image" "$DEST/$year/$month/$(basename "$image")"
-  echo "$image => $DEST/$year/$month/$(basename "$image")"
+  mkdir -p "$DEST/Photos/$year/$month"
+  mv -n "$image" "$DEST/Photos/$year/$month/$(basename "$image")"
+  echo "$image => $DEST/Photos/$year/$month/$(basename "$image")"
 done
 
-# Movies
-mkdir -p "$DEST/Videos/"
+# Videos
 find "$SRC" -type f -iname '*.mov' -o -iname '*.avi' | while read movie; do
-  mv -n "$movie" "$DEST/Videos/"
-  echo "$movie => $DEST/Videos/$(basename "$image")"
+  date=$(stat -c %y "$movie" | grep -ohE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+  year=$(echo $date | cut -d'-' -f 1)
+  month=$(echo $date | cut -d'-' -f 2)
+  mkdir -p "$DEST/Videos/$year/$month"
+  mv -n "$movie" "$DEST/Videos/$year/$month/$(basename "$movie")"
+  echo "$movie => $DEST/Videos/$year/$month/$(basename "$movie")"
 done
 
 # remove empty directories
