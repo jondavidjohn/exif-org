@@ -1,5 +1,7 @@
 # exif-org
 
+[![Build Status](https://travis-ci.org/jondavidjohn/exif-org.svg?branch=master)](https://travis-ci.org/jondavidjohn/exif-org)
+
 This is a tool for a very personal use case, organizing my family media.  I tried to wrangle
 a few tools written in higher level languages, but always ran into problems trying to run them
 in streamlined environments like RaspberryPi and most recently my Western Digital WD MyCloud EX2.
