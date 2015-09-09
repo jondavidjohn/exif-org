@@ -39,14 +39,22 @@ directory that cannot be sorted properly are moved into the `Unsortable` directo
 
 Basic usage is as such
 
-    usage: /usr/local/bin/exif-org [directory to sort from] [destination directory]
+    usage: exif-org [directory to sort from] [destination directory]
 
 ## Installation
 
-    git clone --recursive ... exif-org
+    git clone --recursive git@github.com:jondavidjohn/exif-org.git exif-org
     cd exif-org
 
     ### make sure it works in your environment first! ###
     make test
 
+    make install
+
+### Upgrade
+
+    cd exif-org
+    git pull
+    make test
+    make uninstall
     make install
