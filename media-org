@@ -22,6 +22,12 @@ if [ ! -d "$DEST" ]; then
   exit 1
 fi
 
+if uname | grep -q "Darwin"; then
+  mod_time_fmt="-x -t %Y-%m-%d"
+else
+  mod_time_fmt=""
+fi
+
 # Photos
 find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while read image; do
   date=$(exif "$image" 2> /dev/null | grep "Date" | grep "(Orig" | cut -d'|' -f 2 | cut -d' ' -f 1 )
@@ -38,7 +44,7 @@ find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while 
   # Try to use modified time
   if [ ! -z "SORT_BY_MODIFIED" ]; then
     if [ ! "$year" ] || [ ! "$month" ]; then
-      date=$(stat "$image" | grep "Modify:" | cut -d' ' -f 2)
+      date=$(stat $mod_time_fmt "$image" | grep "Modify:" | cut -d' ' -f 2)
       year=$(echo $date | cut -d'-' -f 1)
       month=$(echo $date | cut -d'-' -f 2)
     fi
@@ -53,7 +59,7 @@ done
 
 # Videos
 find "$SRC" -type f -iname '*.mov' -o -iname '*.avi' -o -iname '*.mp4' | while read movie; do
-  date=$(stat "$movie" | grep "Modify:" | cut -d' ' -f 2)
+  date=$(stat $mod_time_fmt "$movie" | grep "Modify:" | cut -d' ' -f 2)
   year=$(echo $date | cut -d'-' -f 1)
   month=$(echo $date | cut -d'-' -f 2)
   mkdir -p "$DEST/Videos/$year/$month"
