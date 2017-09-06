@@ -8,8 +8,8 @@ if [ -z "$1" ]; then
   exit
 fi
 
-SRC=${1%/}  # directory to sort from (force trailing slash)
-DEST=${2%/} # destination directory (force trailing slash)
+SRC=${1%/}  # directory to sort from (trim trailing slash)
+DEST=${2%/} # destination directory (trim trailing slash)
 REMOTE=$3
 
 # Ensure we have valid directories
@@ -82,7 +82,7 @@ find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while 
   echo "$image => $DEST/Photos/$year/$month/$(basename "$image")"
 
   if ! [ -z "$REMOTE" ]; then
-    rclone move "$REMOTE:$image" "$REMOTE_DEST/Photos/$year/$month/$(basename "$image")"
+    rclone moveto "$REMOTE:$image" "$REMOTE_DEST/Photos/$year/$month/$(basename "$image")"
   fi
 done
 
@@ -96,7 +96,7 @@ find "$SRC" -type f -iname '*.mov' -o -iname '*.avi' -o -iname '*.mp4' | while r
   echo "$movie => $DEST/Videos/$year/$month/$(basename "$movie")"
 
   if ! [ -z "$REMOTE" ]; then
-    rclone move "$REMOTE:$movie" "$REMOTE_DEST/Videos/$year/$month/$(basename "$movie")"
+    rclone moveto "$REMOTE:$movie" "$REMOTE_DEST/Videos/$year/$month/$(basename "$movie")"
   fi
 done
 
@@ -107,9 +107,12 @@ find "$SRC" -type f | while read file; do
   echo "$file => $DEST/Unsortable/$(basename "$file")"
 
   if ! [ -z "$REMOTE" ]; then
-    rclone move "$REMOTE:$file" "$REMOTE_DEST/Unsortable/$(basename "$file")"
+    rclone moveto "$REMOTE:$file" "$REMOTE_DEST/Unsortable/$(basename "$file")"
   fi
 done
 
 # remove empty directories
 find "$SRC" -depth -type d -empty -exec rmdir {} \;
+if ! [ -z "$REMOTE" ]; then
+  rclone rmdirs "$REMOTE_SRC"
+fi
