@@ -4,12 +4,13 @@
 #
 
 if [ -z "$1" ]; then
-  echo "usage: $0 [directory to sort from] [destination directory]"
+  echo "usage: $0 [directory to sort from] [destination directory] [optional rclone remote]"
   exit
 fi
 
 SRC=${1%/}  # directory to sort from (force trailing slash)
 DEST=${2%/} # destination directory (force trailing slash)
+REMOTE=$3
 
 # Ensure we have valid directories
 if [ ! -d "$SRC" ]; then
@@ -19,7 +20,7 @@ fi
 
 if [ ! -d "$DEST" ]; then
   echo "$DEST is not a directory"
-  exit 1
+  exit 2
 fi
 
 if uname | grep -q "Darwin"; then
@@ -27,6 +28,30 @@ if uname | grep -q "Darwin"; then
 else
   mod_time_fmt=""
 fi
+
+if ! [ -z "$REMOTE" ]; then
+
+  hash rclone 2>/dev/null
+  if [ $? != 0 ]; then
+    echo "Remote provided ($REMOTE) but rclone is not installed"
+    exit 3
+  fi
+
+  REMOTE_SRC="$REMOTE:$SRC"
+  rclone lsd -q "$REMOTE_SRC"
+  if [ $? != 0 ]; then
+    echo "$REMOTE_SRC is not a remote directory"
+    exit 4
+  fi
+
+  REMOTE_DEST="$REMOTE:$DEST"
+  rclone lsd -q "$REMOTE_DEST"
+  if [ $? != 0 ]; then
+    echo "$REMOTE_DEST is not a remote directory"
+    exit 5
+  fi
+fi
+
 
 # Photos
 find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while read image; do
@@ -55,6 +80,10 @@ find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while 
   mkdir -p "$DEST/Photos/$year/$month"
   mv -n "$image" "$DEST/Photos/$year/$month/$(basename "$image")"
   echo "$image => $DEST/Photos/$year/$month/$(basename "$image")"
+
+  if ! [ -z "$REMOTE" ]; then
+    rclone move "$REMOTE:$image" "$REMOTE_DEST/Photos/$year/$month/$(basename "$image")"
+  fi
 done
 
 # Videos
@@ -65,11 +94,22 @@ find "$SRC" -type f -iname '*.mov' -o -iname '*.avi' -o -iname '*.mp4' | while r
   mkdir -p "$DEST/Videos/$year/$month"
   mv -n "$movie" "$DEST/Videos/$year/$month/$(basename "$movie")"
   echo "$movie => $DEST/Videos/$year/$month/$(basename "$movie")"
+
+  if ! [ -z "$REMOTE" ]; then
+    rclone move "$REMOTE:$movie" "$REMOTE_DEST/Videos/$year/$month/$(basename "$movie")"
+  fi
+done
+
+# Move everything else remaining into unsortable to be manually dealt with
+mkdir -p "$DEST/Unsortable/"
+find "$SRC" -type f | while read file; do
+  mv -n "$file" "$DEST/Unsortable/$(basename "$file")"
+  echo "$file => $DEST/Unsortable/$(basename "$file")"
+
+  if ! [ -z "$REMOTE" ]; then
+    rclone move "$REMOTE:$file" "$REMOTE_DEST/Unsortable/$(basename "$file")"
+  fi
 done
 
 # remove empty directories
 find "$SRC" -depth -type d -empty -exec rmdir {} \;
-
-# Move everything else remaining into unsortable to be manually dealt with
-mkdir -p "$DEST/Unsortable/"
-mv -n "$SRC/"* "$DEST/Unsortable/" 2>/dev/null || true

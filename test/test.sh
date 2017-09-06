@@ -3,13 +3,18 @@
 testUsageInfoCalledWithNoArguments()
 {
   output=$(./media-org)
-  assertEquals "$output" "usage: ./media-org [directory to sort from] [destination directory]"
+  assertEquals "$output" "usage: ./media-org [directory to sort from] [destination directory] [optional rclone remote]"
   assertEquals 0 $?
 }
 
 testExifToolExists()
 {
   assertNotNull exif
+}
+
+testRcloneExists()
+{
+  assertNotNull rclone
 }
 
 testInvalidSourceDirectory()
@@ -32,7 +37,7 @@ testInvalidDestinationDirectory()
   destination_directory="/tmp/non_existant"
   assertFalse "[ -d $destination_directory ]"
   output=$(./media-org "/tmp/source" "$destination_directory")
-  assertEquals 1 $?
+  assertEquals 2 $?
   assertEquals "$output" "$destination_directory is not a directory"
 
   rm -rf /tmp/source
