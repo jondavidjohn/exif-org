@@ -141,7 +141,40 @@ testJpgSortingByModifiedTime()
   rm -rf /tmp/source /tmp/dest
 }
 
-testVideoSortingByModifiedTime()
+testVideoSortingByFilename()
+{
+  mkdir -p /tmp/source
+  mkdir -p /tmp/dest
+
+  touch "/tmp/source/2013-01-01_filename.mov"
+  touch "/tmp/source/2013-06-05_filename.mp4"
+  touch "/tmp/source/filename_2014-12-03.avi"
+
+  output=$(./media-org /tmp/source/ /tmp/dest/)
+
+  assertEquals 0 $?
+
+  # Directory Structure
+  assertTrue "[ -d /tmp/dest/Videos/2013 ]"
+  assertTrue "[ -d /tmp/dest/Videos/2013/01 ]"
+  assertTrue "[ -d /tmp/dest/Videos/2013/06 ]"
+  assertTrue "[ -d /tmp/dest/Videos/2014 ]"
+  assertTrue "[ -d /tmp/dest/Videos/2014/12 ]"
+
+  # File Targets
+  assertTrue "[ -f '/tmp/dest/Videos/2013/01/2013-01-01_filename.mov' ]"
+  assertTrue "[ -f '/tmp/dest/Videos/2013/06/2013-06-05_filename.mp4' ]"
+  assertTrue "[ -f '/tmp/dest/Videos/2014/12/filename_2014-12-03.avi' ]"
+
+  # Move
+  assertFalse "[ -f '/tmp/source/2013-01-01_filename.mov' ]"
+  assertFalse "[ -f '/tmp/source/2013-06-05_filename.mp4' ]"
+  assertFalse "[ -f '/tmp/source/filename_2014-12-03.avi' ]"
+
+  rm -rf /tmp/source /tmp/dest
+}
+
+testVideoSortingFallbackToModifiedTime()
 {
   mkdir -p /tmp/source
   mkdir -p /tmp/dest
