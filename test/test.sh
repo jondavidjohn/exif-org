@@ -43,7 +43,7 @@ testInvalidDestinationDirectory()
   rm -rf /tmp/source
 }
 
-testJpgSortingByEXIF()
+testImageSortingByEXIF()
 {
   mkdir -p /tmp/source
   mkdir -p /tmp/dest
@@ -74,7 +74,7 @@ testJpgSortingByEXIF()
   rm -rf /tmp/source /tmp/dest
 }
 
-testJpgSortingByFilename()
+testImageSortingByFilename()
 {
   mkdir -p /tmp/source
   mkdir -p /tmp/dest
@@ -107,7 +107,7 @@ testJpgSortingByFilename()
   rm -rf /tmp/source /tmp/dest
 }
 
-testJpgSortingByModifiedTime()
+testImageSortingByModifiedTime()
 {
   mkdir -p /tmp/source
   mkdir -p /tmp/dest

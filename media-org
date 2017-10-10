@@ -54,7 +54,7 @@ fi
 
 
 # Photos
-find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' | while read image; do
+find "$SRC" -type f -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.heic' | while read image; do
   # prefer exif data for date
   date=$(exif "$image" 2> /dev/null | grep "Date" | grep "(Orig" | cut -d'|' -f 2 | cut -d' ' -f 1 )
   year=$(echo $date | cut -d':' -f 1)
